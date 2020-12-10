@@ -38,7 +38,7 @@ export default function CovidStatistics() {
     () => {
       get<CovideServerModel[]>(`countries?yesterday=${yesterday ? 'true' : 'false'}`)
         .then(response => {
-          setData(response.data.map(x => {
+          setData(response.map(x => {
             return {
               country: x.country,
               flag: x.countryInfo.flag,
