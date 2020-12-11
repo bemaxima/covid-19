@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FixedSizeList as List } from 'react-window';
-
+import { usePagination } from '../hooks/usePagination'
 interface ColumnModel<T extends object> {
   id: string;
   name: string;
@@ -23,7 +22,7 @@ interface AbstractTableProps<T extends object> {
   disableNext?: boolean;
 }
 
-export default function AbstractTable<T extends object>({
+function AbstractTable<T extends object>({
   showIndexer = false,
   disablePagination = true,
   keyField,
@@ -52,28 +51,6 @@ export default function AbstractTable<T extends object>({
           </tr>
         </thead>
         <tbody>
-          {/* {!loading && <List
-          height={500}
-          itemCount={data.length}
-          itemSize={26}
-          width={600}
-        > */}
-          {/* {({ index, style }) => {
-            const item = data[index]
-            return (
-              <tr key={String(item[keyField])} style={style}>
-                {showIndexer && <td>{index + 1}</td>}
-                {columns.map(col => (
-                  <td key={col.id}>
-                    {col.render && col.render(item[col.dataIndex])}
-                    {!col.render && item[col.dataIndex]}
-                  </td>
-                ))}
-              </tr>
-            )
-          }
-          }
-        </List>} */}
           {!loading && data.map((item, index) => (
             <tr key={String(item[keyField])}>
               {showIndexer && <td>{disablePagination ? (index + 1) : (((pageIndex! - 1) * pageSize!) + index + 1)}</td>}
@@ -99,4 +76,51 @@ export default function AbstractTable<T extends object>({
       </div>}
     </div>
   )
+}
+
+interface TableProps<T extends object> {
+  columns: ColumnModel<T>[];
+  data: T[];
+  loading: boolean;
+  keyField: keyof T;
+  showIndexer?: boolean;
+  LoadingComponent?: React.ComponentType<unknown>;
+  disablePagination?: boolean;
+}
+
+export default function Table<T extends object>({
+  showIndexer = false,
+  disablePagination = true,
+  keyField,
+  columns,
+  data,
+  loading,
+  LoadingComponent
+}: TableProps<T>) {
+  const {
+    data: slicedData,
+    handlePrevious,
+    handleNext,
+    pageSize,
+    pageIndex,
+    nextDisabled
+  } = usePagination<T>(data);
+
+  return (
+    <AbstractTable<T>
+      disablePagination={disablePagination}
+      showIndexer={showIndexer}
+      keyField={keyField}
+      data={disablePagination ? data: slicedData}
+      onNextPage={handleNext}
+      onPrevPage={handlePrevious}
+      pageIndex={pageIndex}
+      pageSize={pageSize}
+      disableNext={nextDisabled}
+      loading={loading}
+      columns={columns}
+      LoadingComponent={LoadingComponent}
+    />
+  )
+
 }

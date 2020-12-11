@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { get } from '../utility/api';
-import AbstractTable from './Table';
+import Table from './Table';
 import '../App.css'
 
 export interface CovidDataModel {
@@ -27,13 +27,12 @@ type CountryInfoModel = {
 
 type StateModel = CovidDataModel[];
 
-const PAGE_SIZE = 18;
 
 export default function CovidStatistics() {
-  const [pageIndex, setPageIndex] = useState(1);
   const [data, setData] = useState<StateModel>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [yesterday, setYesterday] = useState(true);
+ 
   useEffect(
     () => {
       get<CovideServerModel[]>(`countries?yesterday=${yesterday ? 'true' : 'false'}`)
@@ -57,16 +56,11 @@ export default function CovidStatistics() {
   return (
     <>
       <input type='checkbox' checked={yesterday} onChange={e => setYesterday(e.target.checked)} /> Yesterday
-      <AbstractTable<CovidDataModel>
+      <Table<CovidDataModel>
         disablePagination={false}
         showIndexer
         keyField='country'
-        data={data.slice((pageIndex - 1) * PAGE_SIZE, pageIndex * PAGE_SIZE)}
-        onNextPage={() => setPageIndex(pageIndex + 1)}
-        onPrevPage={() => setPageIndex(pageIndex - 1)}
-        pageIndex={pageIndex}
-        pageSize={PAGE_SIZE}
-        disableNext={(Math.ceil(data.length / PAGE_SIZE)) === pageIndex}
+        data={data}
         loading={loading}
         columns={[
           {
