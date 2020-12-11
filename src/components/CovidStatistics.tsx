@@ -3,6 +3,8 @@ import { get } from '../utility/api';
 import Table from './Table';
 import '../App.css'
 
+const MyTable:any = Table
+
 export interface CovidDataModel {
   country: string;
   flag: string;
@@ -56,7 +58,7 @@ export default function CovidStatistics() {
   return (
     <>
       <input type='checkbox' checked={yesterday} onChange={e => setYesterday(e.target.checked)} /> Yesterday
-      <Table<CovidDataModel>
+      <MyTable
         disablePagination={false}
         showIndexer
         keyField='country'
